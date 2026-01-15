@@ -62,7 +62,6 @@ No. of clock cycles taken to complete can vary each time based on where the inde
 ## Day 4
 ### convert.py
 2D ram is used to store the array. @ is represented as  1 and . as a 0. The python script reads the input text file as stores the data in the ram. We can copy paste the whole text in the initial block in the verilog design.
-The ** assign sumcache** lines are also generated and can be copy pasted to the Main1.v file
 ### Main1.v
 The generate block generates if-else conditions for every element in the ram array. If the necessary condition matches, then the sumram[index] is set to 1. The sumcache adds up all the 137*137 elements of sumram memory block. All these are generated using the python script.
 Thus due to the heavy parallelization, it needs a big FPGA to implement on, but it gives the output immediately with no need for clock cycles.
@@ -81,8 +80,23 @@ The generate block is used to create 194 comparators, which is the number of ID 
 ### Main1_tb.v
 The input values are all copy pasted from the python script.
 ### Main2.v
-The first step involves sorting. The generate block is the design for sorting. The algorithm used is odd-even parallel sort. The **sort_decide** reg alternates every clock cycle to indicate whether the odd or even pair must be sorted. Also there can be multiple same starting ID ranges. In that case, the ending ID ranges are sorted in the descending order. Thus if there are 5 same starting ID's in a row, its corresponding ending ID ranges will be sorted in descending order.\
-The second step is performed in the always block with the state machine. In the 0th state, we wait for 194 clock cycles for the sorting to complete. In the 1st state, we change the ending ID range values so that the start->end->start->end...->end ID ranges are in ascending order. In the second state, we subtract the end-start values and add them giving the final answer.\
+The first step involves sorting. The generate block is the design for sorting. The algorithm used is odd-even parallel sort. The **sort_decide** reg alternates every clock cycle to indicate whether the odd or even pair must be sorted. Also there can be multiple same starting ID ranges. In that case, the ending ID ranges are sorted in the descending order. Thus if there are 5 same starting ID's in a row, its corresponding ending ID ranges will be sorted in descending order.  
+  
+  
+The second step is performed in the always block with the state machine. In the 0th state, we wait for 194 clock cycles for the sorting to complete. In the 1st state, we change the ending ID range values so that the start->end->start->end...->end ID ranges are in ascending order. In the second state, we subtract the end-start values and add them giving the final answer.
 Thus, no. of clock cycles taken to complete will be 4*number of ram range inputs given.
 ### Main2_tb.v
 A delay of 5*194 clock cycles is given for easier viewing of the final answer.
+
+
+## Day 7
+## convert.py
+We store the ^ as 1 and . as 0 in an array of width 141 and height 70. The height can be 70 as we are ignoring the lines full of ...... in the input text file which do not cause any splitting of the rays. **ans2_ram** is also generated and all its initial values set to zero. This reg is of width 64 and length of 141. This is used for part 2 of the problem statement.
+## Main.v
+Both parts of the problem are solved in the same design file. For Part1, we use a register **compare** which stores 1 if there is a ray and 0 if there is no ray in its 141 indexes. The rays are formed based on the logic in the generate block in line 120. If we are the **i**th index in **ram** and the **i+1**th index in ram has ^ along with a 1 in **compare**, then the **i**th index is set to 1 in ram indicating there is a ray now which has been split. We also check the **i-1** index when we are positioned at **i** to check for the same logic as **i+1**.  
+  
+
+Once the rays are formed in a line, the number of times it split is calculated in the **ans1** register in the always block in line 185. Its now a simple and operation between **ram** and **compare** elements and recursive addition till all the 70 input rows are fed. Thus it stops once **pos** reaches 69. Thus it takes 70 clock cycles to calculate the answer.  
+  
+
+For part2, we use the **ans2_ram** in the generate block. Instead of just changing the value to 1 like it is done in **compare** reg, we add the existing value to it. This denotes all the possible paths which the ray can take. Finally once the ray passes through the 70 input rows, we can add all the 141 indexes in **ans2_ram** to find the final answer. Thus, this also takes 70 clock cycles to complete.

@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 04.01.2026 10:08:15
+// Create Date: 14.01.2026 21:31:11
 // Design Name: 
-// Module Name: Main2_tb
+// Module Name: Main_tb
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,23 +20,23 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Main2_tb();
-    reg rst,clk;
-    wire [31:0]sum;
+module Main_tb();
+    reg clk,rst;
+    wire [63:0]ans1,ans2;
     
-    Main2 DUT(
+    Main DUT(
         .clk(clk),
         .rst(rst),
-        .sum(sum)
+        .ans1(ans1),
+        .ans2(ans2)
     );
     
     always #5 clk=~clk;
     
-    initial 
+    initial
     begin
         rst=0;clk=0;
         #1000;
         $finish;
     end
-
 endmodule
